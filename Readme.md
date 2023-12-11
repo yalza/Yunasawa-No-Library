@@ -9,8 +9,10 @@
 
 ## About
 
-This library contains several extension features of Plugins, Tools, Constants, Methods, Patterns that make your life easier!!!  
+This library contains several extension features of Plugins, Tools, Constants, Methods, Patterns that make your life easier!!!
 
+Note:
+- Almost all scripts contains Odin-Inspector attributes, you may need to import Odin package before use those, or you just need to fix all the missing attributes in the scripts (That will make component not pretty anymore)
 
 ## Table Of Contents
 
