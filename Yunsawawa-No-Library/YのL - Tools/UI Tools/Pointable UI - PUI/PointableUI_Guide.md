@@ -16,6 +16,8 @@ A better version of Unity's Button:
 
 <details>
  <summary><b> Transition: Color Tint </b></summary>
+ <i> Note: This transition mode requires Image component </i>
+ <br></br>
   <ul>
     <li> Target Graphic: Image component of object. </li>
     <li> Normal Color: Color of Target Graphic when PUI is idle. </li>
@@ -31,6 +33,8 @@ A better version of Unity's Button:
 
 <details>
  <summary><b> Transition: Sprite Swap </b></summary>
+ <i> Note: This transition mode requires Image component </i>
+ <br></br>
   <ul>
     <li> Target Graphic: Image component of object. </li>
     <li> Normal Sprite: Sprite of Target Graphic when PUI is idle. </li>
