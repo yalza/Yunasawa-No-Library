@@ -1,4 +1,4 @@
-﻿/*************************************************************************************************************
+/*************************************************************************************************************
 *                                                                                                            *
 *  ||||||    ||||||   ||  |||    ||  ||||||||   ||||||   |||||||   ||        ||||||||          ||    ||  ||  *
 *  ||   ||  ||    ||  ||  ||||   ||     ||     ||    ||  ||    ||  ||        ||                ||    ||  ||  *
@@ -11,6 +11,7 @@
 
 using Sirenix.OdinInspector;
 using System.Collections;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -76,26 +77,32 @@ namespace Yunasawa.Utilities.UI
         private bool _isSelected;
         [FoldoutGroup("PUI Mode")] public PUIMode Mode;
         [Space()]
+        [ShowIf("Mode", Value = PUIMode.IgnoreDeselect), FoldoutGroup("PUI Mode")] public string IgnoreDeselectName = "IgnoreDeselect";
         [ShowIf("Mode", Value = PUIMode.IgnoreDeselect), FoldoutGroup("PUI Mode")] public LayerMask IgnoreDeselectLayer;
         #endregion
         #endregion
 
         #region ▶ Methods
         #region ▶ Editor Methods
-        [Button]
-        public void PreviewPUI()
+        public void OnValidate()
         {
-            if (TargetGraphic != null)
+            if (TargetGraphic == null)
+            {
+                TargetGraphic = GetComponent<Image>();
+                if (TargetGraphic == null && Transition != PUITransition.None)
+                {
+                    Debug.Log($"<color=#FFE045><b>⚠ Warning: </b></color> Require <b>Image</b> component if PUI is in <i><b>Color Tint</b></i> or <i><b>Sprite Swap</b></i> transition mode.");
+                }
+            }
+            else
             {
                 if (Transition == PUITransition.ColorTint)
                 {
-                    if (!Interactable) TargetGraphic.color = DisabledColor;
-                    else TargetGraphic.color = NormalColor;
+                    if (NormalColor != Color.white) TargetGraphic.color = NormalColor;
                 }
                 if (Transition == PUITransition.SpriteSwap)
                 {
-                    if (!Interactable) TargetGraphic.sprite = DisabledSprite;
-                    else TargetGraphic.sprite = NormalSprite;
+                    if (NormalSprite != null) TargetGraphic.sprite = NormalSprite;
                 }
             }
         }
@@ -109,7 +116,7 @@ namespace Yunasawa.Utilities.UI
             if (Transition == PUITransition.ColorTint) if (TargetGraphic != null) TargetGraphic.color = NormalColor;
             if (Transition == PUITransition.SpriteSwap) if (TargetGraphic != null) TargetGraphic.sprite = NormalSprite;
 
-            IgnoreDeselectLayer = LayerMask.NameToLayer("IgnoreDeselect");
+            IgnoreDeselectLayer = LayerMask.NameToLayer(IgnoreDeselectName);
         }
         #endregion
 
@@ -121,9 +128,9 @@ namespace Yunasawa.Utilities.UI
             if (Transition == PUITransition.ColorTint) TargetGraphic.color = SelectedColor;
             if (Transition == PUITransition.SpriteSwap) TargetGraphic.sprite = SelectedSprite;
 
-            _isSelected = true;
+            if (!_isSelected) PUIEventHandler("OnSelect", null);
 
-            PUIEventHandler("OnSelect", null);
+            _isSelected = true;
         }
 
         public void OnDeselect(BaseEventData eventData)
@@ -157,9 +164,10 @@ namespace Yunasawa.Utilities.UI
             {
                 if (Transition == PUITransition.ColorTint) TargetGraphic.color = NormalColor;
                 if (Transition == PUITransition.SpriteSwap) TargetGraphic.sprite = NormalSprite;
+                PUIEventHandler("OnClick", eventData);
                 return;
             }
-            eventData.selectedObject = this.gameObject;
+            if (eventData.selectedObject != this.gameObject) eventData.selectedObject = this.gameObject;
 
             PUIEventHandler("OnClick", eventData);
         }
@@ -190,7 +198,10 @@ namespace Yunasawa.Utilities.UI
         {
             PUIInteractableHandler("OnEnter");
 
-            if (Mode == PUIMode.HoverToSelect) eventData.selectedObject = this.gameObject;
+            if (Mode == PUIMode.HoverToSelect)
+            {
+                if (eventData.selectedObject != this.gameObject) eventData.selectedObject = this.gameObject;
+            }
 
             if (Transition == PUITransition.ColorTint) TargetGraphic.color = HighlightedColor;
             if (Transition == PUITransition.SpriteSwap) TargetGraphic.sprite = HighlightedSprite;
@@ -273,7 +284,7 @@ namespace Yunasawa.Utilities.UI
 
     public enum PUITransition
     {
-        ColorTint, SpriteSwap, Animation
+        None, ColorTint, SpriteSwap, Animation
     }
 
     public enum PUIMode
