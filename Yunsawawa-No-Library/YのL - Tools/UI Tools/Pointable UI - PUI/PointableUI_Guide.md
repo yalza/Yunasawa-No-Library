@@ -3,14 +3,29 @@
 <h4 align="center"> A better solution for Unity's Button with more features and advantages. <br><br>
 
 ## Description
+```
+If you are making an inventory system for your game and you use Button to show if the item is selected or invoke methods that
+be called when you clicked on the Button, then you have a very big problem, the item slot (Button) will be deselected when you
+click on a random place. Or when you make a button to delete an item, you want that when you press the button by accident, and you
+want to hover it out of the button then release it to cancel the deleting action, but the Button that Unity gives you is suck? Here
+is the solution:
+
 A better version of Unity's Button:
-- Have more individual modes for different purposes.
+- Have more individual modes for different purposes. Such as
+    + Standard Button: A normal button works the same as Unity's but have more event invoked.
+    + Ignore Deselect: Solution for unwantedly deselect the button with just clicking on UI objects with specific layer.
+    + Hover To Select: Don't need to click on the button, just hover it to make the button selected.
+    + Only Click Button: Button only used for clicking, not be selected.
 - Familiar usage due to some properties are the same with Unity's button.
+```
 
 ## Usage Guide
 
 <h3><i> PUI - Graphic </i></h3>
-<b><i> Usage: </i></b> Change, switch PUI graphic with familiar properties.
+
+```
+Change, switch PUI graphic with familiar properties.
+```
 
 <b><i> Properties: </i></b>
 
@@ -63,7 +78,10 @@ A better version of Unity's Button:
 </details>
 
 <h3><i> PUI - Event </i></h3>
-<b><i> Usage: </i></b> Invoke event assigned to PUI.
+
+```
+Invoke event assigned to PUI.
+```
 
 <b><i> Properties: </i></b>
 
@@ -85,6 +103,10 @@ A better version of Unity's Button:
 
 
 <h3><i> PUI - Mode </i></h3>
+
+```
+Specific mode of PUI for different purposes.
+```
 
 <details>
  <summary><b> Standard Button </b></summary>
