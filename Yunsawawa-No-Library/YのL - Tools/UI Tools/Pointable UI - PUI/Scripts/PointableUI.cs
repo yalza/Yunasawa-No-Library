@@ -42,6 +42,8 @@ namespace Yunasawa.Utilities.UI
         [ShowIf("Transition", Value = PUITransition.SpriteSwap), FoldoutGroup("UI Graphic")] public Sprite SelectedSprite;
         [ShowIf("Transition", Value = PUITransition.SpriteSwap), FoldoutGroup("UI Graphic")] public Sprite DisabledSprite;
         [Space(10)]
+        [ShowIf("Transition", Value = PUITransition.Animation), FoldoutGroup("UI Graphic")] public Animator _Animator;
+        [Space(10)]
         [ShowIf("Transition", Value = PUITransition.Animation), FoldoutGroup("UI Graphic")] public string NormalTrigger = "Normal";
         [ShowIf("Transition", Value = PUITransition.Animation), FoldoutGroup("UI Graphic")] public string HighlightedTrigger = "Highlighted";
         [ShowIf("Transition", Value = PUITransition.Animation), FoldoutGroup("UI Graphic")] public string PressedTrigger = "Pressed";
@@ -86,23 +88,31 @@ namespace Yunasawa.Utilities.UI
         #region ▶ Editor Methods
         public void OnValidate()
         {
-            if (TargetGraphic == null)
+            if (Transition == PUITransition.ColorTint || Transition == PUITransition.SpriteSwap)
             {
-                TargetGraphic = GetComponent<Image>();
-                if (TargetGraphic == null && Transition != PUITransition.None)
+                if (TargetGraphic == null)
                 {
-                    Debug.Log($"<color=#FFE045><b>⚠ Warning: </b></color> Require <b>Image</b> component if PUI is in <i><b>Color Tint</b></i> or <i><b>Sprite Swap</b></i> transition mode.");
+                    TargetGraphic = GetComponent<Image>();
+                    if (TargetGraphic == null) Debug.Log($"<color=#FFE045><b>⚠ Warning: </b></color> Require <b><color=#00FF87>Image</color></b> component if PUI is in <i><b>Color Tint</b></i> or <i><b>Sprite Swap</b></i> transition mode.");
+                }
+                else
+                {
+                    if (Transition == PUITransition.ColorTint)
+                    {
+                        if (NormalColor != Color.white) TargetGraphic.color = NormalColor;
+                    }
+                    if (Transition == PUITransition.SpriteSwap)
+                    {
+                        if (NormalSprite != null) TargetGraphic.sprite = NormalSprite;
+                    }
                 }
             }
-            else
+            if (Transition == PUITransition.Animation)
             {
-                if (Transition == PUITransition.ColorTint)
+                if (_Animator == null)
                 {
-                    if (NormalColor != Color.white) TargetGraphic.color = NormalColor;
-                }
-                if (Transition == PUITransition.SpriteSwap)
-                {
-                    if (NormalSprite != null) TargetGraphic.sprite = NormalSprite;
+                    _Animator = GetComponent<Animator>();
+                    if (_Animator == null) Debug.Log($"<color=#FFE045><b>⚠ Warning: </b></color> Require <b><color=#00FF87>Animator</color></b> component if PUI is in <i><b>Animation</b></i> transition mode.");
                 }
             }
         }
@@ -115,6 +125,7 @@ namespace Yunasawa.Utilities.UI
             }
             if (Transition == PUITransition.ColorTint) if (TargetGraphic != null) TargetGraphic.color = NormalColor;
             if (Transition == PUITransition.SpriteSwap) if (TargetGraphic != null) TargetGraphic.sprite = NormalSprite;
+            if (Transition == PUITransition.Animation) if (_Animator != null) _Animator.Play(NormalTrigger);
 
             IgnoreDeselectLayer = LayerMask.NameToLayer(IgnoreDeselectName);
         }
@@ -127,6 +138,7 @@ namespace Yunasawa.Utilities.UI
 
             if (Transition == PUITransition.ColorTint) TargetGraphic.color = SelectedColor;
             if (Transition == PUITransition.SpriteSwap) TargetGraphic.sprite = SelectedSprite;
+            if (Transition == PUITransition.Animation) if (_Animator != null) _Animator.Play(SelectedTrigger);
 
             if (!_isSelected) PUIEventHandler("OnSelect", null);
 
@@ -143,11 +155,13 @@ namespace Yunasawa.Utilities.UI
 
                 if (Transition == PUITransition.ColorTint) TargetGraphic.color = SelectedColor;
                 if (Transition == PUITransition.SpriteSwap) TargetGraphic.sprite = SelectedSprite;
+                if (Transition == PUITransition.Animation) if (_Animator != null) _Animator.Play(SelectedTrigger);
                 return;
             }
 
             if (Transition == PUITransition.ColorTint) TargetGraphic.color = NormalColor;
             if (Transition == PUITransition.SpriteSwap) TargetGraphic.sprite = NormalSprite;
+            if (Transition == PUITransition.Animation) if (_Animator != null) _Animator.Play(NormalTrigger);
 
             _isSelected = false;
 
@@ -164,6 +178,7 @@ namespace Yunasawa.Utilities.UI
             {
                 if (Transition == PUITransition.ColorTint) TargetGraphic.color = NormalColor;
                 if (Transition == PUITransition.SpriteSwap) TargetGraphic.sprite = NormalSprite;
+                if (Transition == PUITransition.Animation) if (_Animator != null) _Animator.Play(NormalTrigger);
                 PUIEventHandler("OnClick", eventData);
                 return;
             }
@@ -181,6 +196,7 @@ namespace Yunasawa.Utilities.UI
             if (_isSelected) return;
             if (Transition == PUITransition.ColorTint) TargetGraphic.color = PressedColor;
             if (Transition == PUITransition.SpriteSwap) TargetGraphic.sprite = PressedSprite;
+            if (Transition == PUITransition.Animation) if (_Animator != null) _Animator.Play(PressedTrigger);
 
             PUIEventHandler("OnDown", eventData);
         }
@@ -205,6 +221,7 @@ namespace Yunasawa.Utilities.UI
 
             if (Transition == PUITransition.ColorTint) TargetGraphic.color = HighlightedColor;
             if (Transition == PUITransition.SpriteSwap) TargetGraphic.sprite = HighlightedSprite;
+            if (Transition == PUITransition.Animation) if (_Animator != null) _Animator.Play(HighlightedTrigger);
 
             PUIEventHandler("OnEnter", eventData);
         }
@@ -217,6 +234,7 @@ namespace Yunasawa.Utilities.UI
 
             if (Transition == PUITransition.ColorTint) if (TargetGraphic.color != SelectedColor) TargetGraphic.color = NormalColor;
             if (Transition == PUITransition.SpriteSwap) if (TargetGraphic.sprite != SelectedSprite) TargetGraphic.sprite = NormalSprite;
+            if (Transition == PUITransition.Animation) if (_Animator != null) _Animator.Play(NormalTrigger);
 
             PUIEventHandler("OnExit", eventData);
         }
